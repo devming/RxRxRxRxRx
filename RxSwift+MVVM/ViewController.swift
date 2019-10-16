@@ -12,6 +12,8 @@ import UIKit
 
 let MEMBER_LIST_URL = "https://my.api.mockaroo.com/members_with_avatar.json?key=44ce18f0"
 
+/// 4. 나중에 생기는 데이터는 어떻게 정의된걸까?
+
 class ViewController: UIViewController {
     @IBOutlet var timerLabel: UILabel!
     @IBOutlet var editView: UITextView!
@@ -44,26 +46,58 @@ class ViewController: UIViewController {
 //        self.editView.text = getJson()
         
 //      ->
-
-        getJson { json in
+        
+        /// 3. 나중에 생기는 데이터 처리
+        let 나중에생기는데이터 = getJsonAsync()
+        
+        나중에생기는데이터.오겠지 { json in
+            // 처리
             DispatchQueue.main.async {
                 self.editView.text = json
+                
+                self.setVisibleWithAnimation(self.activityIndicator, false)
             }
         }
+
+//        getJson { json in
+//            DispatchQueue.main.async {
+//                self.editView.text = json
+//            }
+//        }
         /// 비동기를 처리하는 좀 더 깔끔한 방식이 없을까?
-        
-        self.setVisibleWithAnimation(self.activityIndicator, false)
     }
     
-    func getJson(_ onCompleted: @escaping (String) -> Void) {
-        
-        DispatchQueue.global().async {
+//    func getJson(_ onCompleted: @escaping (String) -> Void) {
+//
+//        DispatchQueue.global().async {
+//            let url = URL(string: MEMBER_LIST_URL)!
+//            let data = try! Data(contentsOf: url)
+//            let json = String(data: data, encoding: .utf8)!
+//            onCompleted(json)  /// 1. 이렇게 해결!
+//
+//        }
+//    }
+    
+//    func getJsonAsync() -> AsyncResult<String>
+    func getJsonAsync() -> 나중에생기는데이터 {
+        return 나중에생기는데이터() { f in
             let url = URL(string: MEMBER_LIST_URL)!
             let data = try! Data(contentsOf: url)
             let json = String(data: data, encoding: .utf8)!
-            onCompleted(json)  /// 1. 이렇게 해결!
-            
+            f(json)
         }
     }
+}
+
+class 나중에생기는데이터 {
+    let job: (@escaping (String) -> Void) -> Void
+    init(_ job: @escaping (@escaping (String) -> Void) -> Void) {
+        self.job = job
+    }
     
+    func 오겠지(_ f: @escaping (String) -> Void) {
+        DispatchQueue.global().async {
+            self.job(f)
+        }
+    }
 }
