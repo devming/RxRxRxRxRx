@@ -40,11 +40,19 @@ class ViewController: UIViewController {
         editView.text = ""
         setVisibleWithAnimation(activityIndicator, true)
 
-        let url = URL(string: MEMBER_LIST_URL)!
-        let data = try! Data(contentsOf: url)
-        let json = String(data: data, encoding: .utf8)
-        self.editView.text = json
+        self.editView.text = getJson()
         
         self.setVisibleWithAnimation(self.activityIndicator, false)
+    }
+    
+    func getJson() -> String {
+        
+        DispatchQueue.global().async {
+            let url = URL(string: MEMBER_LIST_URL)!
+            let data = try! Data(contentsOf: url)
+            let json = String(data: data, encoding: .utf8)!
+            return json /// 1. 여기서(다른 스레드) 생겨난 결과물을 어떻게 전달할 것인가?!
+        }
+        
     }
 }
