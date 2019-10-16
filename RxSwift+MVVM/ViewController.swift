@@ -44,6 +44,13 @@ class ViewController: UIViewController {
 //        self.editView.text = getJson()
         
 //      ->
+
+        getJson { json in
+            DispatchQueue.main.async {
+                self.editView.text = json
+            }
+        }
+        /// 비동기를 처리하는 좀 더 깔끔한 방식이 없을까?
         
         self.setVisibleWithAnimation(self.activityIndicator, false)
     }
@@ -57,6 +64,6 @@ class ViewController: UIViewController {
             onCompleted(json)  /// 1. 이렇게 해결!
             
         }
-        
     }
+    
 }
