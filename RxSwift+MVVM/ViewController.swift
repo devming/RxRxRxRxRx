@@ -48,16 +48,26 @@ class ViewController: UIViewController {
 //      ->
         
         /// 3. 나중에 생기는 데이터 처리
-        let 나중에생기는데이터 = getJsonAsync()
+//        let 나중에생기는데이터 = getJsonAsync()
+//
+//        나중에생기는데이터.오겠지 { json in
+//            // 처리
+//            DispatchQueue.main.async {
+//                self.editView.text = json
+//
+//                self.setVisibleWithAnimation(self.activityIndicator, false)
+//            }
+//        }
         
-        나중에생기는데이터.오겠지 { json in
-            // 처리
-            DispatchQueue.main.async {
+        let ob = getJsonRx()
+        
+        _ = ob
+            .subscribeOn(ConcurrentDispatchQueueScheduler.init(qos: .background))
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { (json) in
                 self.editView.text = json
-                
                 self.setVisibleWithAnimation(self.activityIndicator, false)
-            }
-        }
+            })
 
 //        getJson { json in
 //            DispatchQueue.main.async {
@@ -79,25 +89,35 @@ class ViewController: UIViewController {
 //    }
     
 //    func getJsonAsync() -> AsyncResult<String>
-    func getJsonAsync() -> 나중에생기는데이터 {
-        return 나중에생기는데이터() { f in
+//    func getJsonAsync() -> 나중에생기는데이터 {
+//        return 나중에생기는데이터() { f in
+//            let url = URL(string: MEMBER_LIST_URL)!
+//            let data = try! Data(contentsOf: url)
+//            let json = String(data: data, encoding: .utf8)!
+//            f(json)
+//        }
+//    }
+    
+    func getJsonRx() -> Observable<String> {
+        return Observable.create { f in
             let url = URL(string: MEMBER_LIST_URL)!
             let data = try! Data(contentsOf: url)
             let json = String(data: data, encoding: .utf8)!
-            f(json)
+            f.onNext(json)
+            return Disposables.create()
         }
     }
 }
 
-class 나중에생기는데이터 {
-    let job: (@escaping (String) -> Void) -> Void
-    init(_ job: @escaping (@escaping (String) -> Void) -> Void) {
-        self.job = job
-    }
-    
-    func 오겠지(_ f: @escaping (String) -> Void) {
-        DispatchQueue.global().async {
-            self.job(f)
-        }
-    }
-}
+//class 나중에생기는데이터 {
+//    let job: (@escaping (String) -> Void) -> Void
+//    init(_ job: @escaping (@escaping (String) -> Void) -> Void) {
+//        self.job = job
+//    }
+//
+//    func 오겠지(_ f: @escaping (String) -> Void) {
+//        DispatchQueue.global().async {
+//            self.job(f)
+//        }
+//    }
+//}
