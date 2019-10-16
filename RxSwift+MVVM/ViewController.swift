@@ -40,18 +40,22 @@ class ViewController: UIViewController {
         editView.text = ""
         setVisibleWithAnimation(activityIndicator, true)
 
-        self.editView.text = getJson()
+//        /// 2. 여기는 어떻게?
+//        self.editView.text = getJson()
+        
+//      ->
         
         self.setVisibleWithAnimation(self.activityIndicator, false)
     }
     
-    func getJson() -> String {
+    func getJson(_ onCompleted: @escaping (String) -> Void) {
         
         DispatchQueue.global().async {
             let url = URL(string: MEMBER_LIST_URL)!
             let data = try! Data(contentsOf: url)
             let json = String(data: data, encoding: .utf8)!
-            return json /// 1. 여기서(다른 스레드) 생겨난 결과물을 어떻게 전달할 것인가?!
+            onCompleted(json)  /// 1. 이렇게 해결!
+            
         }
         
     }
